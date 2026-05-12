@@ -1,0 +1,22 @@
+# Default
+python-dotenv
+# Data Parsing
+pandas
+requests
+# PGVector
+pgvector
+psycopg2-binary
+sqlalchemy
+# PostGIS
+geopandas
+shapely
+geoalchemy2
+# AI
+ollama
+langchain-huggingface
+sentence-transformers
+transformers
+torch
+# API
+fastapi
+uvicorn
