@@ -1,9 +1,9 @@
 import { createBrowserRouter } from 'react-router';
-import App from './App.tsx';
+import { Main } from './pages/Main';
 
 export const router = createBrowserRouter([
 	{
 		path: '/',
-		element: <App />,
+		element: <Main />,
 	},
 ]);
