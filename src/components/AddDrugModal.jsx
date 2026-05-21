@@ -2,8 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 
 export default function AddDrugModal({ onClose, onAdd }) {
   const [name, setName] = useState('');
-  const [file, setFile] = useState(null);
-  const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef();
   const backdropRef = useRef();
 
@@ -16,19 +14,12 @@ export default function AddDrugModal({ onClose, onAdd }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!name.trim()) return;
-    onAdd({ name: name.trim(), file });
+    onAdd({ name: name.trim() });
     onClose();
   };
 
   const handleBackdrop = (e) => {
     if (e.target === backdropRef.current) onClose();
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setDragOver(false);
-    const dropped = e.dataTransfer.files[0];
-    if (dropped && dropped.name.endsWith('.csv')) setFile(dropped);
   };
 
   return (
@@ -73,59 +64,9 @@ export default function AddDrugModal({ onClose, onAdd }) {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="예: 타이레놀"
+              placeholder="약품 이름"
               className="w-full border border-gray-200 rounded-xl px-4 py-3.5 bg-gray-50/40 text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-sky/30 focus:border-sky focus:bg-white transition-all text-[15px]"
             />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">
-              CSV 파일 업로드
-            </label>
-            <div
-              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-              onDragLeave={() => setDragOver(false)}
-              onDrop={handleDrop}
-              onClick={() => document.getElementById('csv-input').click()}
-              className={`relative border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all duration-200 ${
-                dragOver
-                  ? 'border-sky bg-sky-light/20 scale-[1.01]'
-                  : file
-                  ? 'border-emerald-300 bg-emerald-50/30'
-                  : 'border-gray-200 hover:border-sky/40 hover:bg-gray-50/50'
-              }`}
-            >
-              {file ? (
-                <div className="flex flex-col items-center gap-2">
-                  <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <p className="text-sm font-bold text-emerald-600">{file.name}</p>
-                  <p className="text-xs text-gray-400">{(file.size / 1024).toFixed(1)} KB</p>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-7 h-7 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-500">임시TEXT</p>
-                    <p className="text-xs text-gray-300 mt-1">임시TEXT</p>
-                  </div>
-                </div>
-              )}
-              <input
-                id="csv-input"
-                type="file"
-                accept=".csv"
-                onChange={(e) => setFile(e.target.files[0] || null)}
-                className="hidden"
-              />
-            </div>
           </div>
 
           <div className="flex gap-3 justify-end pt-2 border-t border-gray-100 mt-1 -mx-8 px-8 pt-6">
