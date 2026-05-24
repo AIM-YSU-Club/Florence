@@ -6,8 +6,7 @@ interface AddDrugModalProps {
 }
 
 const atcSuggestions = [
-	'N02BE', 'N02AA', 'N02AB', 'N02AJ', 'N02AX', 'N02BF', 'N02CC',
-	'R05CA', 'R05CB', 'R05DA', 'R05DB', 'R06AB', 'R06AX', 'R01AD', 'R01BA',
+	'N02BE', 'R05CB', 'R05FA', 'R05CA', 'R06AX', 'R06AE', 'R01BA', 'R05DB',
 ];
 
 export const AddDrugModal = ({ onClose, onSubmit }: AddDrugModalProps) => {

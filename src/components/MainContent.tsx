@@ -15,23 +15,16 @@ import type { Medicine, Predict4wRes, Predict7dRes } from '../api';
 type Tab = 'dashboard' | 'drugs' | 'info';
 type DrugView = 'list' | 'detail';
 
-/* ── ATC code options for search ── */
+/* ── ATC code options ── */
 const atcOptions = [
 	{ code: 'N02BE', label: '아닐리드계', group: 'N - 신경계' },
-	{ code: 'N02AA', label: '천연 아편 알칼로이드', group: 'N - 신경계' },
-	{ code: 'N02AB', label: '페닐피페리딘 유도체', group: 'N - 신경계' },
-	{ code: 'N02AJ', label: '복합 오피오이드', group: 'N - 신경계' },
-	{ code: 'N02AX', label: '기타 오피오이드', group: 'N - 신경계' },
-	{ code: 'N02BF', label: '가바펜티노이드', group: 'N - 신경계' },
-	{ code: 'N02CC', label: '세로토닌 작용제', group: 'N - 신경계' },
-	{ code: 'R05CA', label: '거담제', group: 'R - 호흡기계' },
 	{ code: 'R05CB', label: '점액용해제', group: 'R - 호흡기계' },
-	{ code: 'R05DA', label: '아편 유도체', group: 'R - 호흡기계' },
-	{ code: 'R05DB', label: '기타 진해제', group: 'R - 호흡기계' },
-	{ code: 'R06AB', label: '항히스타민제', group: 'R - 호흡기계' },
+	{ code: 'R05FA', label: '기침감기 복합제', group: 'R - 호흡기계' },
+	{ code: 'R05CA', label: '거담제', group: 'R - 호흡기계' },
 	{ code: 'R06AX', label: '기타 항히스타민제', group: 'R - 호흡기계' },
-	{ code: 'R01AD', label: '코르티코스테로이드', group: 'R - 호흡기계' },
+	{ code: 'R06AE', label: '피페라진 유도체', group: 'R - 호흡기계' },
 	{ code: 'R01BA', label: '교감신경흥분제', group: 'R - 호흡기계' },
+	{ code: 'R05DB', label: '기타 진해제', group: 'R - 호흡기계' },
 ];
 
 const weekLabels = ['4주 전', '3주 전', '2주 전', '1주 전'];
@@ -293,15 +286,19 @@ function DashboardView() {
 				];
 
 				return (
-					<div key={code} className="mb-10">
-						<div className="mb-4 flex items-center gap-3">
-							<span className="rounded-md bg-(--primary)/12 px-2 py-1 text-xs font-bold text-(--primary)">{code}</span>
-							<h3 className="text-lg font-bold text-(--text-h)">{atcInfo?.label ?? code}</h3>
+					<div key={code} className="mb-10 rounded-2xl border border-(--border) bg-(--card) p-6 shadow-[var(--shadow-sm)]">
+						{/* Section header */}
+						<div className="mb-5 flex items-center justify-between">
+							<div className="flex items-center gap-3">
+								<span className="rounded-lg bg-(--primary)/12 px-2.5 py-1 text-xs font-bold tracking-wide text-(--primary)">{code}</span>
+								<h3 className="text-lg font-bold text-(--text-h)">{atcInfo?.label ?? code}</h3>
+								<span className="text-xs text-(--text-muted)">{atcInfo?.group}</span>
+							</div>
 						</div>
 
 						{/* Prediction summary */}
-						<div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-							<StatCard label="예상 사용량 (4주)" value={formatNumber(r.predicted_value)} unit="건" />
+						<div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+							<StatCard label="예상 사용량 (4주)" value={formatNumber(r.predicted_value)} unit="건" accent />
 							<StatCard label="3년 평균 사용량" value={formatNumber(r.mean_value)} unit="건" />
 							<StatCard label="평균 대비 증감률" value={`${r.growth_rate >= 0 ? '+' : ''}${r.growth_rate.toFixed(1)}`} unit="%" delta={r.growth_rate} />
 						</div>
@@ -311,7 +308,7 @@ function DashboardView() {
 							{climateCharts.map((chart) => {
 							const latest = chart.data[chart.data.length - 1];
 							return (
-								<div key={chart.key} className="rounded-xl border border-(--border) bg-(--card) p-4 shadow-[var(--shadow-sm)]">
+								<div key={chart.key} className="rounded-xl border border-(--border) bg-(--bg) p-4">
 									<div className="mb-3 flex items-center justify-between">
 										<p className="text-xs font-bold text-(--text)">{chart.label} <span className="text-(--text-muted)">({chart.unit})</span></p>
 										<p className="text-lg font-black" style={{ color: chart.color }}>
@@ -349,12 +346,16 @@ function DashboardView() {
 	);
 }
 
-function StatCard({ label, value, unit, delta }: { label: string; value: string; unit: string; delta?: number }) {
+/* ── Stat Card ── */
+function StatCard({ label, value, unit, delta, accent }: { label: string; value: string; unit: string; delta?: number; accent?: boolean }) {
 	return (
-		<div className="rounded-xl border border-(--border) bg-(--card) px-4 py-4 shadow-[var(--shadow-sm)]">
+		<div className={`rounded-xl border px-4 py-4 ${accent ? 'border-(--primary)/30 bg-gradient-to-br from-(--primary)/5 to-(--secondary)/5' : 'border-(--border) bg-(--bg)'}`}>
 			<p className="text-[11px] font-semibold text-(--text-muted)">{label}</p>
 			<p className="mt-2 flex items-baseline gap-1">
-				<span className={`text-2xl font-black ${delta !== undefined ? (delta >= 0 ? 'text-rose-500' : 'text-blue-500') : 'text-(--text-h)'}`}>{value}</span>
+				<span className={`text-2xl font-black ${
+					delta !== undefined ? (delta >= 0 ? 'text-rose-500' : 'text-blue-500') :
+					accent ? 'text-(--primary)' : 'text-(--text-h)'
+				}`}>{value}</span>
 				<span className="text-xs font-medium text-(--text-muted)">{unit}</span>
 			</p>
 		</div>
@@ -363,8 +364,7 @@ function StatCard({ label, value, unit, delta }: { label: string; value: string;
 
 function formatNumber(n: number) {
 	if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-	if (n >= 1_000) return `${(n / 1_000).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
-	return n.toFixed(0);
+	return Math.round(n).toLocaleString();
 }
 
 /* ═══════════════════════════════════════
@@ -377,6 +377,30 @@ const cardGradients = [
 	{ from: '#3d7da8', to: '#6ba5c7' },
 	{ from: '#356f96', to: '#5a90b5' },
 ];
+
+const statusConfig = {
+	DONE: { bg: 'bg-emerald-400/20', text: 'text-emerald-100', dot: 'bg-emerald-300', label: '학습 완료' },
+	TRAINING: { bg: 'bg-amber-400/20', text: 'text-amber-100', dot: 'bg-amber-300 animate-pulse', label: '학습 중' },
+	FAILED: { bg: 'bg-rose-400/20', text: 'text-rose-100', dot: 'bg-rose-300', label: '학습 실패' },
+	NONE: { bg: 'bg-white/10', text: 'text-white/60', dot: 'bg-white/40', label: '학습 필요' },
+} as const;
+
+const statusConfigLight = {
+	DONE: { bg: 'bg-emerald-50', text: 'text-emerald-600', dot: 'bg-emerald-400', label: '학습 완료' },
+	TRAINING: { bg: 'bg-amber-50', text: 'text-amber-600', dot: 'bg-amber-400 animate-pulse', label: '학습 중' },
+	FAILED: { bg: 'bg-rose-50', text: 'text-rose-600', dot: 'bg-rose-400', label: '학습 실패' },
+	NONE: { bg: 'bg-(--bg-2)', text: 'text-(--text-muted)', dot: 'bg-(--text-muted)/40', label: '학습 필요' },
+} as const;
+
+function PtStatusBadge({ status, variant = 'dark' }: { status: keyof typeof statusConfig; variant?: 'dark' | 'light' }) {
+	const cfg = variant === 'dark' ? statusConfig[status] : statusConfigLight[status];
+	return (
+		<span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-bold ${cfg.bg} ${cfg.text} ${variant === 'dark' ? 'backdrop-blur-sm' : ''}`}>
+			<span className={`h-1.5 w-1.5 rounded-full ${cfg.dot}`} />
+			{cfg.label}
+		</span>
+	);
+}
 
 function DrugGridView({ medicines, onCardClick, onAddClick, onDelete }: {
 	medicines: Medicine[]; onCardClick: (m: Medicine) => void; onAddClick: () => void; onDelete: (id: string) => void;
@@ -417,31 +441,15 @@ function DrugGridView({ medicines, onCardClick, onAddClick, onDelete }: {
 							<button type="button" onClick={() => onCardClick(med)}
 								className="flex h-full w-full flex-col justify-between p-5 text-left text-white">
 								<div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/[0.07] transition-transform duration-500 group-hover:scale-150" />
-								<div className="relative z-10">
+								<div className="relative z-10 flex items-center gap-2">
 									<span className="rounded-md bg-white/15 px-2 py-0.5 text-[10px] font-bold tracking-widest backdrop-blur-sm">
-										{med.atc4 ?? '임시TEXT'}
+										{med.atc4 ?? '미분류'}
 									</span>
 								</div>
 								<div className="relative z-10 mt-auto">
 									<p className="text-lg font-black leading-tight">{med.name}</p>
-									<div className="mt-2 flex items-center gap-1.5">
-										<span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm ${
-											med.pt_status === 'DONE' ? 'bg-emerald-400/20 text-emerald-100' :
-											med.pt_status === 'TRAINING' ? 'bg-amber-400/20 text-amber-100' :
-											med.pt_status === 'FAILED' ? 'bg-rose-400/20 text-rose-100' :
-											'bg-white/10 text-white/60'
-										}`}>
-											<span className={`h-1.5 w-1.5 rounded-full ${
-												med.pt_status === 'DONE' ? 'bg-emerald-300' :
-												med.pt_status === 'TRAINING' ? 'bg-amber-300 animate-pulse' :
-												med.pt_status === 'FAILED' ? 'bg-rose-300' :
-												'bg-white/40'
-											}`} />
-											{med.pt_status === 'DONE' && '학습 완료'}
-											{med.pt_status === 'TRAINING' && '학습 중'}
-											{med.pt_status === 'FAILED' && '학습 실패'}
-											{med.pt_status === 'NONE' && '학습 필요'}
-										</span>
+									<div className="mt-2">
+										<PtStatusBadge status={med.pt_status} variant="dark" />
 									</div>
 								</div>
 							</button>
@@ -518,87 +526,87 @@ function DrugDetailView({ medicine, onBack }: { medicine: Medicine; onBack: () =
 	return (
 		<div>
 			{/* Header */}
-			<div className="mb-8 flex items-center justify-between">
-				<div className="flex items-center gap-4">
-					<button type="button" onClick={onBack}
-						className="flex h-9 w-9 items-center justify-center rounded-lg border border-(--border) bg-(--card) text-(--text-muted) transition-all hover:bg-(--bg-2) hover:text-(--text)">
-						<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
-					</button>
-					<div>
-						<div className="flex items-center gap-2.5">
-							<h2 className="text-2xl font-black tracking-tight text-(--text-h)">{medicine.name}</h2>
-							<span className="rounded-md bg-(--primary)/12 px-2 py-0.5 text-[10px] font-bold tracking-wider text-(--primary)">{medicine.atc4 ?? '임시TEXT'}</span>
+			<div className="mb-6 rounded-2xl border border-(--border) bg-(--card) p-6 shadow-[var(--shadow-sm)]">
+				<div className="flex items-center justify-between">
+					<div className="flex items-center gap-4">
+						<button type="button" onClick={onBack}
+							className="flex h-9 w-9 items-center justify-center rounded-lg border border-(--border) bg-(--bg) text-(--text-muted) transition-all hover:bg-(--bg-2) hover:text-(--text)">
+							<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+						</button>
+						<div>
+							<div className="flex items-center gap-2.5">
+								<h2 className="text-2xl font-black tracking-tight text-(--text-h)">{medicine.name}</h2>
+								<span className="rounded-md bg-(--primary)/12 px-2 py-0.5 text-[10px] font-bold tracking-wider text-(--primary)">{medicine.atc4 ?? '미분류'}</span>
+								<PtStatusBadge status={medicine.pt_status} variant="light" />
+							</div>
+							<p className="mt-1 text-xs text-(--text-muted)">기후 기반 7일 판매 예측</p>
 						</div>
-						<p className="mt-0.5 text-xs text-(--text-muted)">기후 기반 7일 판매 예측</p>
+					</div>
+					<div className="flex items-center gap-2.5">
+						{/* CSV Upload */}
+						<input ref={csvInputRef} type="file" accept=".csv" onChange={handleCsvUpload} className="hidden" />
+						<ActionButton
+							onClick={() => csvInputRef.current?.click()}
+							disabled={uploadStatus === 'loading'}
+							status={uploadStatus}
+							labels={{ idle: 'CSV 업로드', loading: '업로드 중...', success: '✓ 업로드 완료', error: '업로드 실패' }}
+							icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>}
+							variant="secondary"
+						/>
+						{/* Pretrain */}
+						<ActionButton
+							onClick={handlePretrain}
+							disabled={trainStatus === 'loading'}
+							status={trainStatus}
+							labels={{ idle: '모델 학습', loading: '학습 중...', success: '✓ 학습 완료', error: '학습 실패' }}
+							icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>}
+							variant="primary"
+						/>
 					</div>
 				</div>
-				<div className="flex items-center gap-2.5">
-					{/* CSV Upload */}
-					<input ref={csvInputRef} type="file" accept=".csv" onChange={handleCsvUpload} className="hidden" />
-					<button type="button" onClick={() => csvInputRef.current?.click()} disabled={uploadStatus === 'loading'}
-						className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-[13px] font-bold transition-all ${
-							uploadStatus === 'success' ? 'bg-emerald-500 text-white' :
-							uploadStatus === 'error' ? 'bg-rose-500 text-white' :
-							uploadStatus === 'loading' ? 'bg-(--bg-2) text-(--text-muted)' :
-							'border border-(--border) bg-(--card) text-(--text) shadow-[var(--shadow-sm)] hover:bg-(--bg-2)'
-						}`}>
-						{uploadStatus === 'loading' && (
-							<svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-								<path d="M21 12a9 9 0 1 1-6.219-8.56" />
-							</svg>
-						)}
-						{uploadStatus === 'idle' && (
-							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-								<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
-							</svg>
-						)}
-						{uploadStatus === 'idle' && 'CSV 업로드'}
-						{uploadStatus === 'loading' && '업로드 중...'}
-						{uploadStatus === 'success' && '✓ 업로드 완료'}
-						{uploadStatus === 'error' && '업로드 실패'}
-					</button>
 
-					{/* Pretrain */}
-					<button type="button" onClick={handlePretrain} disabled={trainStatus === 'loading'}
-						className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-[13px] font-bold transition-all ${
-							trainStatus === 'success' ? 'bg-emerald-500 text-white' :
-							trainStatus === 'error' ? 'bg-rose-500 text-white' :
-							trainStatus === 'loading' ? 'bg-(--bg-2) text-(--text-muted)' :
-							'bg-(--primary) text-white shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow)]'
-						}`}>
-						{trainStatus === 'loading' && (
-							<svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-								<path d="M21 12a9 9 0 1 1-6.219-8.56" />
-							</svg>
-						)}
-						{trainStatus === 'idle' && (
-							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-								<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />
-							</svg>
-						)}
-						{trainStatus === 'idle' && '모델 학습'}
-						{trainStatus === 'loading' && '학습 중...'}
-						{trainStatus === 'success' && '✓ 학습 완료'}
-						{trainStatus === 'error' && '학습 실패'}
-					</button>
-				</div>
+				{/* Predicted value highlight */}
+				{data && (
+					<div className="mt-5 flex items-center gap-6 rounded-xl bg-gradient-to-r from-(--primary)/8 to-(--secondary)/5 px-5 py-4">
+						<div className="flex items-center gap-3">
+							<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-(--primary)/15 text-(--primary)">
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg>
+							</div>
+							<div>
+								<p className="text-[11px] font-semibold text-(--text-muted)">7일 예상 판매량</p>
+								<p className="text-xl font-black text-(--primary)">{Math.round(data.predicted_value).toLocaleString()}<span className="ml-1 text-xs font-semibold text-(--text-muted)">건</span></p>
+							</div>
+						</div>
+						<div className="h-8 w-px bg-(--border)" />
+						<div>
+							<p className="text-[11px] font-semibold text-(--text-muted)">평균 판매량</p>
+							<p className="text-xl font-black text-(--text-h)">{Math.round(data.mean_value).toLocaleString()}<span className="ml-1 text-xs font-semibold text-(--text-muted)">건</span></p>
+						</div>
+						<div className="h-8 w-px bg-(--border)" />
+						<div>
+							<p className="text-[11px] font-semibold text-(--text-muted)">평균 대비 증감률</p>
+							<p className={`text-xl font-black ${data.growth_rate >= 0 ? 'text-rose-500' : 'text-blue-500'}`}>
+								{data.growth_rate >= 0 ? '+' : ''}{data.growth_rate.toFixed(1)}<span className="ml-0.5 text-xs font-semibold opacity-60">%</span>
+							</p>
+						</div>
+					</div>
+				)}
 			</div>
 
 			{!data ? (
 				<div className="rounded-2xl border border-(--border) bg-(--card) p-12 text-center shadow-[var(--shadow-sm)]">
-					<p className="text-sm text-(--text-muted)">예측 데이터가 없습니다. 판매 데이터를 업로드하고 사전학습을 실행하세요.</p>
+					<div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-(--bg-2)/50 text-(--text-muted)">
+						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+							<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
+						</svg>
+					</div>
+					<p className="text-sm font-semibold text-(--text-h)">예측 데이터가 없습니다</p>
+					<p className="mt-1 text-xs text-(--text-muted)">판매 데이터(CSV)를 업로드하고 사전학습을 실행하세요.</p>
 				</div>
 			) : (
 				<>
-					{/* Stat summary */}
-					<div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-						<StatCard label="7일 예상 판매량" value={formatNumber(data.predicted_value)} unit="건" />
-						<StatCard label="평균 판매량" value={formatNumber(data.mean_value)} unit="건" />
-						<StatCard label="평균 대비 증감률" value={`${data.growth_rate >= 0 ? '+' : ''}${data.growth_rate.toFixed(1)}`} unit="%" delta={data.growth_rate} />
-					</div>
-
 					{/* Climate charts */}
-					<section className="mb-8">
+					<section>
 						<h3 className="mb-4 flex items-center gap-2 text-sm font-bold text-(--text-h)">
 							<span className="flex h-5 w-5 items-center justify-center rounded bg-(--primary)/12 text-(--primary)">
 								<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg>
@@ -640,6 +648,35 @@ function DrugDetailView({ medicine, onBack }: { medicine: Medicine; onBack: () =
 				</>
 			)}
 		</div>
+	);
+}
+
+/* ── Action Button (reusable) ── */
+function ActionButton({ onClick, disabled, status, labels, icon, variant }: {
+	onClick: () => void;
+	disabled: boolean;
+	status: 'idle' | 'loading' | 'success' | 'error';
+	labels: { idle: string; loading: string; success: string; error: string };
+	icon: React.ReactNode;
+	variant: 'primary' | 'secondary';
+}) {
+	const base = status === 'success' ? 'bg-emerald-500 text-white' :
+		status === 'error' ? 'bg-rose-500 text-white' :
+		status === 'loading' ? 'bg-(--bg-2) text-(--text-muted)' :
+		variant === 'primary'
+			? 'bg-(--primary) text-white shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow)]'
+			: 'border border-(--border) bg-(--card) text-(--text) shadow-[var(--shadow-sm)] hover:bg-(--bg-2)';
+
+	return (
+		<button type="button" onClick={onClick} disabled={disabled}
+			className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-[13px] font-bold transition-all ${base}`}>
+			{status === 'loading' ? (
+				<svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+					<path d="M21 12a9 9 0 1 1-6.219-8.56" />
+				</svg>
+			) : status === 'idle' ? icon : null}
+			{labels[status]}
+		</button>
 	);
 }
 
