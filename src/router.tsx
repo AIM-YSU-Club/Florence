@@ -10,15 +10,7 @@ export const router = createBrowserRouter([
 	{
 		path: '/login',
 		element: (
-			<div
-				style={{
-					minHeight: '100vh',
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'center',
-					background: '#f6f8fb',
-				}}
-			>
+			<div className="flex min-h-screen items-center justify-center bg-[#f6f8fb]">
 				<Login />
 			</div>
 		),
