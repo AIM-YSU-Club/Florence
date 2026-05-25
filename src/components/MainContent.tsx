@@ -1,24 +1,34 @@
 import { useEffect, useState } from 'react';
 import * as api from '../api';
 import type { Medicine } from '../api';
-import { AddDrugModal } from './AddDrugModal';
+import { AddDrugModal } from './modals/AddDrugModal.tsx';
 import type { DrugView, Tab } from './main-content/constants';
 import { DashboardView } from './main-content/DashboardView';
 import { DrugDetailView } from './main-content/DrugDetailView';
 import { DrugGridView } from './main-content/DrugGridView';
 import { PharmacyInfoView } from './main-content/PharmacyInfoView';
 import { Sidebar } from './main-content/Sidebar';
+import { RequireLoginModal } from './modals/RequireLoginModal.tsx';
 
 export const MainContent = () => {
 	const [activeTab, setActiveTab] = useState<Tab>('dashboard');
 	const [drugView, setDrugView] = useState<DrugView>('list');
-	const [selectedMedicine, setSelectedMedicine] = useState<Medicine | null>(null);
+	const [selectedMedicine, setSelectedMedicine] = useState<Medicine | null>(
+		null,
+	);
 	const [medicines, setMedicines] = useState<Medicine[]>([]);
 	const [showModal, setShowModal] = useState(false);
 
 	const [pharmacyName, setPharmacyName] = useState('');
 	const [pharmacyAddress, setPharmacyAddress] = useState('');
 	const [saved, setSaved] = useState(false);
+
+	/**
+	 * api.isLoggin() 사용해서 로그인 상태 반환
+	 */
+	const [showRequireLoginModal, setShowRequireLoginModal] = useState(
+		api.isNotLoggedIn,
+	);
 
 	// 약품 목록을 다시 불러와 현재 탭에서 사용하는 기준 데이터를 동기화한다.
 	useEffect(() => {
@@ -28,12 +38,17 @@ export const MainContent = () => {
 
 		const run = async () => {
 			try {
-				const [list, pharmacy] = await Promise.all([api.getMedicines(), api.getPharmacy()]);
+				const [list, pharmacy] = await Promise.all([
+					api.getMedicines(),
+					api.getPharmacy(),
+				]);
 				if (cancelled) return;
 
 				setMedicines(list);
-				if (pharmacy.pharmacy_name) setPharmacyName(pharmacy.pharmacy_name);
-				if (pharmacy.pharmacy_address) setPharmacyAddress(pharmacy.pharmacy_address);
+				if (pharmacy.pharmacy_name)
+					setPharmacyName(pharmacy.pharmacy_name);
+				if (pharmacy.pharmacy_address)
+					setPharmacyAddress(pharmacy.pharmacy_address);
 			} catch {
 				/* not logged in or error */
 			}
@@ -49,7 +64,10 @@ export const MainContent = () => {
 	// 약국 정보를 저장하고 잠깐 저장 완료 상태를 노출한다.
 	const handleSavePharmacy = async () => {
 		try {
-			await api.updatePharmacy({ name: pharmacyName, address: pharmacyAddress });
+			await api.updatePharmacy({
+				name: pharmacyName,
+				address: pharmacyAddress,
+			});
 			setSaved(true);
 			setTimeout(() => setSaved(false), 2000);
 		} catch {
@@ -109,20 +127,30 @@ export const MainContent = () => {
 			/>
 
 			<div className="flex-1 overflow-y-auto bg-(--bg)">
-				<div key={`${activeTab}-${drugView}-${selectedMedicine?.medicine_id ?? ''}`} className="mx-auto max-w-270 animate-[fadeIn_0.2s_ease-out] px-10 py-8">
+				<div
+					key={`${activeTab}-${drugView}-${selectedMedicine?.medicine_id ?? ''}`}
+					className="mx-auto max-w-270 animate-[fadeIn_0.2s_ease-out] px-10 py-8"
+				>
 					{activeTab === 'dashboard' && <DashboardView />}
 					{activeTab === 'drugs' && drugView === 'list' && (
-						<DrugGridView medicines={medicines} onCardClick={openDrug} onAddClick={() => setShowModal(true)} onDelete={handleDeleteDrug} />
-					)}
-					{activeTab === 'drugs' && drugView === 'detail' && selectedMedicine && (
-						<DrugDetailView
-							medicine={selectedMedicine}
-							onBack={() => {
-								setDrugView('list');
-								setSelectedMedicine(null);
-							}}
+						<DrugGridView
+							medicines={medicines}
+							onCardClick={openDrug}
+							onAddClick={() => setShowModal(true)}
+							onDelete={handleDeleteDrug}
 						/>
 					)}
+					{activeTab === 'drugs' &&
+						drugView === 'detail' &&
+						selectedMedicine && (
+							<DrugDetailView
+								medicine={selectedMedicine}
+								onBack={() => {
+									setDrugView('list');
+									setSelectedMedicine(null);
+								}}
+							/>
+						)}
 					{activeTab === 'info' && (
 						<PharmacyInfoView
 							name={pharmacyName}
@@ -136,7 +164,17 @@ export const MainContent = () => {
 				</div>
 			</div>
 
-			{showModal && <AddDrugModal onClose={() => setShowModal(false)} onSubmit={handleAddDrug} />}
+			{showModal && (
+				<AddDrugModal
+					onClose={() => setShowModal(false)}
+					onSubmit={handleAddDrug}
+				/>
+			)}
+			{showRequireLoginModal && (
+				<RequireLoginModal
+					onClose={() => setShowRequireLoginModal(false)}
+				/>
+			)}
 		</main>
 	);
 };

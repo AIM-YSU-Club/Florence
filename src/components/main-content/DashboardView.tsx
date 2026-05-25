@@ -11,7 +11,7 @@ export function DashboardView() {
 	const [selectedAtc, setSelectedAtc] = useState<string[]>(['N02BE']);
 	const [selectedGroup, setSelectedGroup] = useState<string>('all');
 	const [results, setResults] = useState<Record<string, Predict4wRes>>({});
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(!api.isNotLoggedIn());
 
 	const groups = ['all', ...Array.from(new Set(atcOptions.map((a) => a.group)))];
 	const filteredAtc = selectedGroup === 'all' ? atcOptions : atcOptions.filter((a) => a.group === selectedGroup);
@@ -26,6 +26,8 @@ export function DashboardView() {
 	};
 
 	useEffect(() => {
+		if (api.isNotLoggedIn()) return;
+
 		if (!selectedAtc.length) return;
 
 		let cancelled = false;

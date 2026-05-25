@@ -40,6 +40,15 @@ export function getToken() {
 	return localStorage.getItem('token');
 }
 
+/**
+ * 현재 로그인이 되어있는지 안되어있는지 확인하여 **True** or **False**로 반환합니다.
+ * @returns {boolean} - 로그인이 되어있다면 true 반환
+ */
+export function isNotLoggedIn(): boolean {
+	// console.log(getToken() === null);
+	return getToken() === null;
+}
+
 /* ── Dashboard / Pharmacy ── */
 
 export interface PharmacyUpdateReq {
@@ -115,9 +124,13 @@ export interface SalesUploadRes {
 export async function uploadSales(medicineId: string, file: File) {
 	const formData = new FormData();
 	formData.append('file', file);
-	const res = await api.post<SalesUploadRes>('/dashboard/upload_sales', formData, {
-		params: { medicine_id: medicineId },
-	});
+	const res = await api.post<SalesUploadRes>(
+		'/dashboard/upload_sales',
+		formData,
+		{
+			params: { medicine_id: medicineId },
+		},
+	);
 	return res.data;
 }
 
