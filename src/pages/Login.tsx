@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Mail, Lock, Layers } from 'lucide-react';
 import * as api from '../api';
-import './login.css';
+import '../assets/css/login.css';
+import * as React from 'react';
 
 export default function Login() {
 	const navigate = useNavigate();
