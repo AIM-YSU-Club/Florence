@@ -1,13 +1,4 @@
 import { useEffect, useState } from 'react';
-import {
-	Area,
-	AreaChart,
-	CartesianGrid,
-	ResponsiveContainer,
-	Tooltip,
-	XAxis,
-	YAxis,
-} from 'recharts';
 import * as api from '../../api';
 import type { Predict4wRes } from '../../api';
 import { atcOptions, weekLabels } from './constants';
@@ -21,21 +12,10 @@ export function DashboardView() {
 	const [results, setResults] = useState<Record<string, Predict4wRes>>({});
 	const [loading, setLoading] = useState(true);
 
-	const groups = [
-		'all',
-		...Array.from(new Set(atcOptions.map((a) => a.group))),
-	];
-	const filteredAtc =
-		selectedGroup === 'all'
-			? atcOptions
-			: atcOptions.filter((a) => a.group === selectedGroup);
 
 	// 선택한 ATC 코드를 토글해 비교 대상을 관리한다.
 	const toggleAtc = (code: string) => {
 		setSelectedAtc((prev) => {
-			const next = prev.includes(code)
-				? prev.filter((c) => c !== code)
-				: [...prev, code];
 			setLoading(next.length > 0);
 			return next;
 		});
@@ -81,18 +61,9 @@ export function DashboardView() {
 	return (
 		<div>
 			<div className="mb-6">
-				<h2 className="text-2xl font-black tracking-tight text-(--text-h)">
-					메인 대시보드
-				</h2>
-				<p className="mt-1 text-sm text-(--text-muted)">
-					ATC 분류 코드별 향후 4주간 수요 예측을 확인합니다.
-				</p>
 			</div>
 
 			<div className="mb-8 rounded-2xl border border-(--border) bg-(--card) p-5 shadow-(--shadow-sm)">
-				<p className="mb-3 text-xs font-bold tracking-wider text-(--text-muted) uppercase">
-					분류 필터
-				</p>
 				<div className="mb-3 flex flex-wrap gap-2">
 					{groups.map((group) => (
 						<button
@@ -121,20 +92,12 @@ export function DashboardView() {
 									{isSelected && '✓'}
 								</span>
 								<span className="font-bold">{atc.code}</span>
-								<span className="text-(--text-muted)">
-									{atc.label}
-								</span>
 							</button>
 						);
 					})}
 				</div>
 			</div>
 
-			{loading && (
-				<p className="py-12 text-center text-sm text-(--text-muted)">
-					예측 데이터를 불러오는 중...
-				</p>
-			)}
 
 			{!loading &&
 				selectedAtc.map((code) => {
@@ -143,60 +106,15 @@ export function DashboardView() {
 
 					const atcInfo = atcOptions.find((a) => a.code === code);
 					const climateCharts = [
-						{
-							key: 'ta',
-							label: '평균 기온',
-							unit: '°C',
-							color: '#5b9bd5',
-							data: result.ta_4w,
-						},
-						{
-							key: 'hm',
-							label: '평균 습도',
-							unit: '%',
-							color: '#6ba5c7',
-							data: result.hm_4w,
-						},
-						{
-							key: 'rn',
-							label: '강수량',
-							unit: 'mm',
-							color: '#6ba589',
-							data: result.rn_4w,
-						},
 					];
 
 					return (
-						<div
-							key={code}
-							className="mb-10 rounded-2xl border border-(--border) bg-(--card) p-6 shadow-(--shadow-sm)"
-						>
 							<div className="mb-5 flex items-center justify-between">
 								<div className="flex items-center gap-3">
-									<span className="rounded-lg bg-(--primary)/12 px-2.5 py-1 text-xs font-bold tracking-wide text-(--primary)">
-										{code}
-									</span>
-									<h3 className="text-lg font-bold text-(--text-h)">
-										{atcInfo?.label ?? code}
-									</h3>
-									<span className="text-xs text-(--text-muted)">
-										{atcInfo?.group}
-									</span>
 								</div>
 							</div>
 
 							<div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
-								<StatCard
-									label="예상 사용량 (4주)"
-									value={formatNumber(result.predicted_value)}
-									unit="건"
-									accent
-								/>
-								<StatCard
-									label="3년 평균 사용량"
-									value={formatNumber(result.mean_value)}
-									unit="건"
-								/>
 								<StatCard
 									label="평균 대비 증감률"
 									value={`${result.growth_rate >= 0 ? '+' : ''}${result.growth_rate.toFixed(1)}`}
@@ -207,120 +125,19 @@ export function DashboardView() {
 
 							<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
 								{climateCharts.map((chart) => {
-									const latest =
-										chart.data[chart.data.length - 1];
 									return (
-										<div
-											key={chart.key}
-											className="rounded-xl border border-(--border) bg-(--bg) p-4"
-										>
 											<div className="mb-3 flex items-center justify-between">
 												<p className="text-xs font-bold text-(--text)">
-													{chart.label}{' '}
-													<span className="text-(--text-muted)">
-														({chart.unit})
-													</span>
 												</p>
-												<p
-													className="text-lg font-black"
-													style={{
-														color: chart.color,
-													}}
-												>
 													{latest}
-													<span className="ml-0.5 text-[10px] font-semibold opacity-60">
-														{chart.unit}
-													</span>
 												</p>
 											</div>
-											<ResponsiveContainer
-												width="100%"
-												height={140}
-												className=""
-											>
 												<AreaChart
-													data={chart.data.map(
-														(value, index) => ({
-															name: weekLabels[
-																index
-															],
-															value,
-														}),
-													)}
-													margin={{
-														top: 4,
-														right: 8,
-														left: -14,
-														bottom: 0,
-													}}
 												>
 													<defs>
-														<linearGradient
-															id={`dg-${code}-${chart.key}`}
-															x1="0"
-															y1="0"
-															x2="0"
-															y2="1"
-														>
-															<stop
-																offset="0%"
-																stopColor={
-																	chart.color
-																}
-																stopOpacity={
-																	0.2
-																}
-															/>
-															<stop
-																offset="100%"
-																stopColor={
-																	chart.color
-																}
-																stopOpacity={
-																	0.01
-																}
-															/>
 														</linearGradient>
 													</defs>
-													<CartesianGrid
-														strokeDasharray="3 3"
-														stroke="var(--border)"
-														strokeOpacity={0.4}
-													/>
-													<XAxis
-														dataKey="name"
-														tick={{
-															fontSize: 10,
-															fill: 'var(--text-muted)',
-														}}
-														axisLine={false}
-														tickLine={false}
-													/>
-													<YAxis
-														width={38}
-														tick={{
-															fontSize: 10,
-															fill: 'var(--text-muted)',
-														}}
-														axisLine={false}
-														tickLine={false}
-													/>
 													<Tooltip
-														formatter={(value) => [
-															`${value} ${chart.unit}`,
-															chart.label,
-														]}
-														contentStyle={
-															tooltipStyle
-														}
-														itemStyle={{
-															color: '#f8fafc',
-														}}
-														labelStyle={{
-															color: '#94a3b8',
-															fontWeight: 700,
-															fontSize: 11,
-														}}
 													/>
 													<Area
 														type="monotone"
@@ -328,17 +145,6 @@ export function DashboardView() {
 														stroke={chart.color}
 														strokeWidth={2}
 														fill={`url(#dg-${code}-${chart.key})`}
-														dot={{
-															r: 3,
-															fill: chart.color,
-															strokeWidth: 0,
-														}}
-														activeDot={{
-															r: 5,
-															stroke: chart.color,
-															strokeWidth: 2,
-															fill: 'white',
-														}}
 													/>
 												</AreaChart>
 											</ResponsiveContainer>
@@ -350,11 +156,6 @@ export function DashboardView() {
 					);
 				})}
 
-			{!loading && !selectedAtc.length && (
-				<p className="py-16 text-center text-sm text-(--text-muted)">
-					위 필터에서 ATC 코드를 선택하세요.
-				</p>
-			)}
 		</div>
 	);
 }
