@@ -175,6 +175,6 @@ export const MainContent = () => {
 					onClose={() => setShowRequireLoginModal(false)}
 				/>
 			)}
-		</main>
-	);
-};
+			</main>
+		);
+	};
