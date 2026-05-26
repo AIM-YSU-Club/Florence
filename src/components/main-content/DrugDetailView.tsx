@@ -13,7 +13,16 @@ export function DrugDetailView({ medicine, onBack }: { medicine: Medicine; onBac
 	const [trainStatus, setTrainStatus] = useState<'idle' | 'loading' | 'success' | 'error'>(
 		medicine.pt_status === 'TRAINING' ? 'loading' : medicine.pt_status === 'DONE' ? 'success' : 'idle',
 	);
-	const [uploadStatus, setUploadStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+	const [uploadStatus, setUploadStatus] = useState<
+		'idle' | 'loading' | 'success' | 'error'
+	>('idle');
+
+	const [showCsvUploadHelpModal, setShowCsvUploadHelpModal] = useState(false);
+	const [doNotShowCsvHelpAgain, setDoNotShowCsvHelpAgain] = useState(
+		localStorage.getItem(CSV_UPLOAD_HELP_DISMISSED_KEY) === 'true',
+	);
+
 	const csvInputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
@@ -76,7 +85,31 @@ export function DrugDetailView({ medicine, onBack }: { medicine: Medicine; onBac
 		if (csvInputRef.current) csvInputRef.current.value = '';
 	};
 
-	if (loading) return <p className="py-20 text-center text-sm text-(--text-muted)">데이터를 불러오는 중...</p>;
+	// 도움말 확인 후 기존 hidden file input을 열어 업로드 흐름을 이어간다.
+	const handleConfirmCsvHelp = () => {
+		if (doNotShowCsvHelpAgain) {
+			localStorage.setItem(CSV_UPLOAD_HELP_DISMISSED_KEY, 'true');
+		} else {
+			localStorage.removeItem(CSV_UPLOAD_HELP_DISMISSED_KEY);
+		}
+		setShowCsvUploadHelpModal(false);
+		csvInputRef.current?.click();
+	};
+
+	const handleOpenCsvUpload = () => {
+		if (doNotShowCsvHelpAgain) {
+			csvInputRef.current?.click();
+			return;
+		}
+		setShowCsvUploadHelpModal(true);
+	};
+
+	if (loading)
+		return (
+			<p className="py-20 text-center text-sm text-(--text-muted)">
+				데이터를 불러오는 중...
+			</p>
+		);
 
 	const climateCharts = data
 		? [
@@ -96,7 +129,16 @@ export function DrugDetailView({ medicine, onBack }: { medicine: Medicine; onBac
 							onClick={onBack}
 							className="flex h-9 w-9 items-center justify-center rounded-lg border border-(--border) bg-(--bg) text-(--text-muted) transition-all hover:bg-(--bg-2) hover:text-(--text)"
 						>
-							<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+							<svg
+								width="15"
+								height="15"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="2"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+							>
 								<polyline points="15 18 9 12 15 6" />
 							</svg>
 						</button>
@@ -112,9 +154,15 @@ export function DrugDetailView({ medicine, onBack }: { medicine: Medicine; onBac
 						</div>
 					</div>
 					<div className="flex items-center gap-2.5">
-						<input ref={csvInputRef} type="file" accept=".csv" onChange={handleCsvUpload} className="hidden" />
+						<input
+							ref={csvInputRef}
+							type="file"
+							accept=".csv"
+							onChange={handleCsvUpload}
+							className="hidden"
+						/>
 						<ActionButton
-							onClick={() => csvInputRef.current?.click()}
+							onClick={handleOpenCsvUpload}
 							disabled={uploadStatus === 'loading'}
 							status={uploadStatus}
 							labels={{ idle: 'CSV 업로드', loading: '업로드 중...', success: '✓ 업로드 완료', error: '업로드 실패' }}
@@ -127,6 +175,28 @@ export function DrugDetailView({ medicine, onBack }: { medicine: Medicine; onBac
 							}
 							variant="secondary"
 						/>
+						<button
+							type="button"
+							onClick={() => setShowCsvUploadHelpModal(true)}
+							className="flex h-9 w-9 items-center justify-center rounded-full border border-(--border) bg-(--card) text-(--text-muted) transition-all hover:bg-(--bg-2) hover:text-(--text)"
+							aria-label="CSV 업로드 도움말 다시 보기"
+							title="CSV 업로드 도움말"
+						>
+							<svg
+								width="16"
+								height="16"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="2"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+							>
+								<circle cx="12" cy="12" r="9" />
+								<path d="M9.09 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3" />
+								<line x1="12" y1="17" x2="12.01" y2="17" />
+							</svg>
+						</button>
 						<ActionButton
 							onClick={handlePretrain}
 							disabled={trainStatus === 'loading'}
@@ -252,6 +322,15 @@ export function DrugDetailView({ medicine, onBack }: { medicine: Medicine; onBac
 						})}
 					</div>
 				</section>
+			)}
+
+			{showCsvUploadHelpModal && (
+				<CsvUploadHelpMessageModal
+					onClose={() => setShowCsvUploadHelpModal(false)}
+					onConfirm={handleConfirmCsvHelp}
+					doNotShowAgain={doNotShowCsvHelpAgain}
+					onDoNotShowAgainChange={setDoNotShowCsvHelpAgain}
+				/>
 			)}
 		</div>
 	);
