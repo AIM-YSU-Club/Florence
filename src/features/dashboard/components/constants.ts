@@ -13,7 +13,15 @@ export const atcOptions = [
 ];
 
 export const weekLabels = ['4주 전', '3주 전', '2주 전', '1주 전'];
-export const dayLabels = ['6일 전', '5일 전', '4일 전', '3일 전', '2일 전', '어제', '오늘'];
+export const dayLabels = [
+	'6일 전',
+	'5일 전',
+	'4일 전',
+	'3일 전',
+	'2일 전',
+	'어제',
+	'오늘',
+];
 
 export const cardGradients = [
 	{ from: '#5b9bd5', to: '#8cc0eb' },
@@ -23,15 +31,55 @@ export const cardGradients = [
 ];
 
 export const statusConfig = {
-	DONE: { bg: 'bg-emerald-400/20', text: 'text-emerald-100', dot: 'bg-emerald-300', label: '학습 완료' },
-	TRAINING: { bg: 'bg-amber-400/20', text: 'text-amber-100', dot: 'bg-amber-300 animate-pulse', label: '학습 중' },
-	FAILED: { bg: 'bg-rose-400/20', text: 'text-rose-100', dot: 'bg-rose-300', label: '학습 실패' },
-	NONE: { bg: 'bg-white/10', text: 'text-white/60', dot: 'bg-white/40', label: '학습 필요' },
+	DONE: {
+		bg: 'bg-emerald-400/20',
+		text: 'text-emerald-100',
+		dot: 'bg-emerald-300',
+		label: '학습 완료',
+	},
+	TRAINING: {
+		bg: 'bg-amber-400/20',
+		text: 'text-amber-100',
+		dot: 'bg-amber-300 animate-pulse',
+		label: '학습 중',
+	},
+	FAILED: {
+		bg: 'bg-rose-400/20',
+		text: 'text-rose-100',
+		dot: 'bg-rose-300',
+		label: '학습 실패',
+	},
+	NONE: {
+		bg: 'bg-white/10',
+		text: 'text-white/60',
+		dot: 'bg-white/40',
+		label: '학습 필요',
+	},
 } as const;
 
 export const statusConfigLight = {
-	DONE: { bg: 'bg-emerald-50', text: 'text-emerald-600', dot: 'bg-emerald-400', label: '학습 완료' },
-	TRAINING: { bg: 'bg-amber-50', text: 'text-amber-600', dot: 'bg-amber-400 animate-pulse', label: '학습 중' },
-	FAILED: { bg: 'bg-rose-50', text: 'text-rose-600', dot: 'bg-rose-400', label: '학습 실패' },
-	NONE: { bg: 'bg-(--bg-2)', text: 'text-(--text-muted)', dot: 'bg-(--text-muted)/40', label: '학습 필요' },
+	DONE: {
+		bg: 'bg-emerald-50',
+		text: 'text-emerald-600',
+		dot: 'bg-emerald-400',
+		label: '학습 완료',
+	},
+	TRAINING: {
+		bg: 'bg-amber-50',
+		text: 'text-amber-600',
+		dot: 'bg-amber-400 animate-pulse',
+		label: '학습 중',
+	},
+	FAILED: {
+		bg: 'bg-rose-50',
+		text: 'text-rose-600',
+		dot: 'bg-rose-400',
+		label: '학습 실패',
+	},
+	NONE: {
+		bg: 'bg-(--bg-2)',
+		text: 'text-(--text-muted)',
+		dot: 'bg-(--text-muted)/40',
+		label: '학습 필요',
+	},
 } as const;

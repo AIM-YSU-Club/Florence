@@ -35,8 +35,7 @@ export const AddDrugModal = ({ onClose, onSubmit }: AddDrugModalProps) => {
 			className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[6px]"
 			onClick={(e) => {
 				if (e.target === e.currentTarget) onClose();
-			}}
-		>
+			}}>
 			<div className="w-full max-w-md animate-[fadeIn_0.15s_ease-out] rounded-2xl border border-(--border) bg-(--card) p-7 shadow-(--shadow-lg)">
 				<div className="mb-6 flex items-center justify-between">
 					<h3 className="text-lg font-black text-(--text-h)">
@@ -45,8 +44,7 @@ export const AddDrugModal = ({ onClose, onSubmit }: AddDrugModalProps) => {
 					<button
 						type="button"
 						onClick={onClose}
-						className="flex h-8 w-8 items-center justify-center rounded-lg text-(--text-muted) transition-colors hover:bg-(--bg-2) hover:text-(--text)"
-					>
+						className="flex h-8 w-8 items-center justify-center rounded-lg text-(--text-muted) transition-colors hover:bg-(--bg-2) hover:text-(--text)">
 						<svg
 							width="16"
 							height="16"
@@ -54,8 +52,7 @@ export const AddDrugModal = ({ onClose, onSubmit }: AddDrugModalProps) => {
 							fill="none"
 							stroke="currentColor"
 							strokeWidth="2"
-							strokeLinecap="round"
-						>
+							strokeLinecap="round">
 							<line x1="18" y1="6" x2="6" y2="18" />
 							<line x1="6" y1="6" x2="18" y2="18" />
 						</svg>
@@ -67,8 +64,7 @@ export const AddDrugModal = ({ onClose, onSubmit }: AddDrugModalProps) => {
 					<div className="flex flex-col gap-1.5">
 						<label
 							htmlFor="drug-name"
-							className="text-[11px] font-bold tracking-wider text-(--text-muted) uppercase"
-						>
+							className="text-[11px] font-bold tracking-wider text-(--text-muted) uppercase">
 							약품명
 						</label>
 						<input
@@ -85,8 +81,7 @@ export const AddDrugModal = ({ onClose, onSubmit }: AddDrugModalProps) => {
 					<div className="relative flex flex-col gap-1.5">
 						<label
 							htmlFor="atc-code"
-							className="text-[11px] font-bold tracking-wider text-(--text-muted) uppercase"
-						>
+							className="text-[11px] font-bold tracking-wider text-(--text-muted) uppercase">
 							ATC 분류 코드{' '}
 							<span className="font-normal text-(--text-muted)">
 								— 선택사항
@@ -119,8 +114,7 @@ export const AddDrugModal = ({ onClose, onSubmit }: AddDrugModalProps) => {
 												setAtc4(s);
 												setShowSuggestions(false);
 											}}
-											className="w-full px-3 py-1.5 text-left text-xs font-semibold text-(--text) hover:bg-(--bg-2)"
-										>
+											className="w-full px-3 py-1.5 text-left text-xs font-semibold text-(--text) hover:bg-(--bg-2)">
 											{s}
 										</button>
 									))}
@@ -133,16 +127,14 @@ export const AddDrugModal = ({ onClose, onSubmit }: AddDrugModalProps) => {
 					<button
 						type="button"
 						onClick={onClose}
-						className="rounded-lg border border-(--border) px-5 py-2 text-sm font-semibold text-(--text) transition-all hover:bg-(--bg-2)"
-					>
+						className="rounded-lg border border-(--border) px-5 py-2 text-sm font-semibold text-(--text) transition-all hover:bg-(--bg-2)">
 						취소
 					</button>
 					<button
 						type="button"
 						onClick={handleSubmit}
 						disabled={!name.trim()}
-						className="rounded-lg bg-(--primary) px-5 py-2 text-sm font-bold text-white shadow-(--shadow-sm) transition-all hover:shadow-(--shadow) disabled:cursor-not-allowed disabled:opacity-30"
-					>
+						className="rounded-lg bg-(--primary) px-5 py-2 text-sm font-bold text-white shadow-(--shadow-sm) transition-all hover:shadow-(--shadow) disabled:cursor-not-allowed disabled:opacity-30">
 						약품 추가
 					</button>
 				</div>

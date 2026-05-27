@@ -20,8 +20,7 @@ export function RequireLoginModal({ onClose }: { onClose: () => void }) {
 				<div className="mt-4 flex justify-end">
 					<button
 						onClick={redirectToLogin}
-						className="h-10 w-27 rounded-xl border border-(--border) bg-(--card) text-(--text) transition-all duration-100 hover:bg-(--card-hover)"
-					>
+						className="h-10 w-27 rounded-xl border border-(--border) bg-(--card) text-(--text) transition-all duration-100 hover:bg-(--card-hover)">
 						로그인하기
 					</button>
 				</div>
