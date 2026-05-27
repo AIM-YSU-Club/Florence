@@ -3,7 +3,7 @@ import * as api from '../api';
 
 export const Header = () => {
 	const navigate = useNavigate();
-	const loggedIn = !!api.getToken();
+	const notloggedIn = api.isNotLoggedIn();
 
 	const handleLogout = () => {
 		api.logout();
@@ -15,8 +15,7 @@ export const Header = () => {
 			<Link
 				to="/"
 				className="flex items-center gap-2.5"
-				reloadDocument={true}
-			>
+				reloadDocument={true}>
 				<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-(--primary) to-(--secondary) shadow-sm">
 					<svg
 						width="16"
@@ -26,8 +25,7 @@ export const Header = () => {
 						stroke="white"
 						strokeWidth="2.5"
 						strokeLinecap="round"
-						strokeLinejoin="round"
-					>
+						strokeLinejoin="round">
 						<path d="M12 2L2 7l10 5 10-5-10-5z" />
 						<path d="M2 17l10 5 10-5" />
 						<path d="M2 12l10 5 10-5" />
@@ -41,7 +39,7 @@ export const Header = () => {
 				</span>
 			</Link>
 			<div className="flex items-center gap-3">
-				{loggedIn ? (
+				{!notloggedIn ? (
 					<>
 						<div className="flex items-center gap-2 rounded-lg bg-(--bg-2)/50 px-3 py-1.5">
 							<div className="h-2 w-2 rounded-full bg-emerald-400" />
@@ -52,8 +50,7 @@ export const Header = () => {
 						<button
 							type="button"
 							onClick={handleLogout}
-							className="rounded-lg border border-(--border) px-3 py-1.5 text-xs font-semibold text-(--text-muted) transition hover:bg-(--bg-2) hover:text-(--text)"
-						>
+							className="rounded-lg border border-(--border) px-3 py-1.5 text-xs font-semibold text-(--text-muted) transition hover:bg-(--bg-2) hover:text-(--text)">
 							로그아웃
 						</button>
 					</>
@@ -61,8 +58,7 @@ export const Header = () => {
 					<button
 						type="button"
 						onClick={() => navigate('/login')}
-						className="rounded-lg bg-(--primary) px-4 py-1.5 text-xs font-bold text-white shadow-sm transition hover:shadow-md"
-					>
+						className="rounded-lg bg-(--primary) px-4 py-1.5 text-xs font-bold text-white shadow-sm transition hover:shadow-md">
 						로그인
 					</button>
 				)}

@@ -28,6 +28,7 @@ export async function login(email: string, password: string) {
 	formData.append('password', password);
 	const res = await api.post('/auth/login', formData);
 	const { access_token } = res.data;
+	localStorage.setItem('email', email);
 	localStorage.setItem('token', access_token);
 	return access_token as string;
 }

@@ -1,3 +1,5 @@
+import csvHelpImage from '../../../assets/img/csvHelp.png';
+
 export function CsvUploadHelpMessageModal({
 	onClose,
 	onConfirm,
@@ -34,36 +36,31 @@ export function CsvUploadHelpMessageModal({
 					</p>
 					<p className="text-sm">
 						예시 이미지
-						<img
-							src="src/assets/img/csvHelp.png"
-							alt="도움말 이미지"
-						/>
+						<img src={csvHelpImage} alt="도움말 이미지" />
 					</p>
-					</div>
-					<label className="mt-4 flex cursor-pointer items-center gap-2 text-sm text-(--text)">
-						<input
-							type="checkbox"
-							checked={doNotShowAgain}
-							onChange={(e) =>
-								onDoNotShowAgainChange(e.target.checked)
-							}
-							className="h-4 w-4 rounded border border-(--border)"
-						/>
-						다시 보지 않기
-					</label>
-					<div className="mt-4 flex justify-end">
-						<button
-							type="button"
+				</div>
+				<label className="mt-4 flex cursor-pointer items-center gap-2 text-sm text-(--text)">
+					<input
+						type="checkbox"
+						checked={doNotShowAgain}
+						onChange={(e) =>
+							onDoNotShowAgainChange(e.target.checked)
+						}
+						className="h-4 w-4 rounded border border-(--border)"
+					/>
+					다시 보지 않기
+				</label>
+				<div className="mt-4 flex justify-end">
+					<button
+						type="button"
 						onClick={onClose}
-						className="mr-2 h-10 w-27 rounded-xl border border-(--border) bg-(--card) text-(--text) transition-all duration-100 hover:bg-(--card-hover)"
-					>
+						className="mr-2 h-10 w-27 rounded-xl border border-(--border) bg-(--card) text-(--text) transition-all duration-100 hover:bg-(--card-hover)">
 						수정할게요..
 					</button>
 					<button
 						type="button"
 						onClick={onConfirm}
-						className="h-10 w-27 rounded-xl border border-(--border) bg-(--card) text-(--text) transition-all duration-100 hover:bg-(--card-hover)"
-					>
+						className="h-10 w-27 rounded-xl border border-(--border) bg-(--card) text-(--text) transition-all duration-100 hover:bg-(--card-hover)">
 						확인했어요!
 					</button>
 				</div>

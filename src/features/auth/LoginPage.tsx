@@ -1,18 +1,19 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Mail, Lock, Layers } from 'lucide-react';
-import * as api from '../api';
-import '../assets/css/login.css';
+import * as api from '../../api';
+import './login.css';
 import * as React from 'react';
 
 export default function Login() {
 	const navigate = useNavigate();
+	const savedEmail = localStorage.getItem('email') ?? '';
 	const [isLoginMode, setIsLoginMode] = useState(true);
 	const [error, setError] = useState('');
 	const [loading, setLoading] = useState(false);
 
 	const [formData, setFormData] = useState({
-		email: '',
+		email: savedEmail,
 		password: '',
 		confirmPassword: '',
 	});
@@ -41,6 +42,7 @@ export default function Login() {
 				await api.register(formData.email, formData.password);
 				await api.login(formData.email, formData.password);
 			}
+			localStorage.setItem('email', formData.email);
 			navigate('/');
 		} catch (err: unknown) {
 			const detail = (
@@ -109,6 +111,7 @@ export default function Login() {
 								placeholder="florence@example.com"
 								value={formData.email}
 								onChange={handleChange}
+								autoComplete="email webauthn"
 								required
 							/>
 						</div>
@@ -119,8 +122,7 @@ export default function Login() {
 							className="form-group"
 							style={{
 								marginBottom: isLoginMode ? '24px' : '0',
-							}}
-						>
+							}}>
 							<label className="form-label">비밀번호</label>
 							<div className="input-wrapper">
 								<Lock className="input-icon" />
@@ -162,8 +164,7 @@ export default function Login() {
 					<button
 						type="submit"
 						className="btn-submit"
-						disabled={loading}
-					>
+						disabled={loading}>
 						{loading
 							? '처리 중...'
 							: isLoginMode
