@@ -22,7 +22,7 @@ export const DashboardLayout = () => {
 	 * api.isLoggin() 사용해서 로그인 상태 반환
 	 */
 	const [showRequireLoginModal, setShowRequireLoginModal] = useState(
-		api.isNotLoggedIn,
+		api.isNotLoggedIn(),
 	);
 
 	// 약품 목록을 다시 불러와 현재 탭에서 사용하는 기준 데이터를 동기화한다.

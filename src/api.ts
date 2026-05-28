@@ -1,19 +1,61 @@
-import axios from 'axios';
+import axios, { AxiosError, HttpStatusCode } from 'axios';
 
 // Dev: Vite proxy "/api" → "http://175.210.157.48:8000"
 // Prod: 직접 호출 (백엔드 CORS 설정 필요)
 const BASE = import.meta.env.DEV ? '/api' : 'http://175.210.157.48:8000';
+const AUTH_EXPIRES_AT_KEY = 'auth_expires_at';
+const LOGIN_SESSION_MS = 30 * 60 * 1000;
 
 const api = axios.create({ baseURL: BASE });
+let isHandlingUnauthorized = false;
+
+function notifyAuthChanged() {
+	window.dispatchEvent(new Event('auth-changed'));
+}
+
+function isAuthRequest(url?: string) {
+	return url?.startsWith('/auth/') ?? false;
+}
+
+function handleUnauthorizedOnce() {
+	if (isHandlingUnauthorized) return;
+
+	isHandlingUnauthorized = true;
+	logout();
+
+	if (window.location.pathname !== '/login') {
+		window.location.assign('/login');
+	}
+}
 
 // Attach JWT token to every request
 api.interceptors.request.use((config) => {
 	const token = localStorage.getItem('token');
+	if (token && isTokenExpired() && !isAuthRequest(config.url)) {
+		handleUnauthorizedOnce();
+		return Promise.reject(new AxiosError('Token expired'));
+	}
+
 	if (token) {
 		config.headers.Authorization = `Bearer ${token}`;
 	}
 	return config;
 });
+
+api.interceptors.response.use(
+	(response) => response,
+	(error) => {
+		if (
+			axios.isAxiosError(error) &&
+			error.response?.status === HttpStatusCode.Unauthorized &&
+			!isAuthRequest(error.config?.url)
+		) {
+			handleUnauthorizedOnce();
+		}
+
+		return Promise.reject(error);
+	},
+);
 
 /* ── Auth ── */
 
@@ -28,17 +70,53 @@ export async function login(email: string, password: string) {
 	formData.append('password', password);
 	const res = await api.post('/auth/login', formData);
 	const { access_token } = res.data;
+	const expiresAt = Date.now() + LOGIN_SESSION_MS;
+
+	isHandlingUnauthorized = false;
 	localStorage.setItem('email', email);
 	localStorage.setItem('token', access_token);
+	localStorage.setItem(AUTH_EXPIRES_AT_KEY, String(expiresAt));
+	notifyAuthChanged();
 	return access_token as string;
 }
 
 export function logout() {
 	localStorage.removeItem('token');
+	localStorage.removeItem(AUTH_EXPIRES_AT_KEY);
+	notifyAuthChanged();
 }
 
 export function getToken() {
+	if (isTokenExpired()) {
+		logout();
+		return null;
+	}
+
 	return localStorage.getItem('token');
+}
+
+export function getTokenExpiresAt() {
+	const expiresAt = Number(localStorage.getItem(AUTH_EXPIRES_AT_KEY));
+	if (Number.isFinite(expiresAt) && expiresAt > 0) return expiresAt;
+
+	if (!localStorage.getItem('token')) return null;
+
+	const nextExpiresAt = Date.now() + LOGIN_SESSION_MS;
+	localStorage.setItem(AUTH_EXPIRES_AT_KEY, String(nextExpiresAt));
+	return nextExpiresAt;
+}
+
+export function getTokenRemainingMs() {
+	const expiresAt = getTokenExpiresAt();
+	if (!expiresAt) return 0;
+	return Math.max(0, expiresAt - Date.now());
+}
+
+export function isTokenExpired() {
+	const token = localStorage.getItem('token');
+	const expiresAt = getTokenExpiresAt();
+
+	return Boolean(token && expiresAt && Date.now() >= expiresAt);
 }
 
 /**
