@@ -21,6 +21,7 @@ export function DashboardView() {
 	const [results, setResults] = useState<Record<string, Predict4wRes>>({});
 	const [loading, setLoading] = useState(!api.isNotLoggedIn());
 	const [hasServerError, setHasServerError] = useState(false);
+	const isLoggedIn = !api.isNotLoggedIn();
 
 	const groups = [
 		'all',
@@ -44,7 +45,7 @@ export function DashboardView() {
 	};
 
 	useEffect(() => {
-		if (api.isNotLoggedIn() || !selectedAtc.length) return;
+		if (!isLoggedIn || !selectedAtc.length) return;
 
 		let cancelled = false;
 
@@ -58,7 +59,7 @@ export function DashboardView() {
 							const data = await api.predictNext4w(code);
 							return [code, data] as const;
 						} catch (error) {
-							if (!cancelled) {
+							if (!cancelled && !api.isNotLoggedIn()) {
 								console.error(
 									`predictNext4w failed for ${code}`,
 									error,
@@ -87,9 +88,9 @@ export function DashboardView() {
 		return () => {
 			cancelled = true;
 		};
-	}, [selectedAtc]);
+	}, [isLoggedIn, selectedAtc]);
 
-	if (api.isNotLoggedIn()) {
+	if (!isLoggedIn) {
 		return (
 			<div>
 				<div className="mb-6">
