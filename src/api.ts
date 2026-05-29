@@ -200,6 +200,31 @@ export interface SalesUploadRes {
 	total_rows_updated: number;
 }
 
+export function getApiErrorDetail(
+	error: unknown,
+	fallback = '요청에 실패했습니다.',
+) {
+	if (!axios.isAxiosError(error)) return fallback;
+
+	const detail = error.response?.data?.detail;
+	if (typeof detail === 'string') return detail;
+
+	if (Array.isArray(detail)) {
+		return detail
+			.map((item) => {
+				if (typeof item === 'string') return item;
+				if (item && typeof item === 'object' && 'msg' in item) {
+					return String(item.msg);
+				}
+				return null;
+			})
+			.filter(Boolean)
+			.join('\n');
+	}
+
+	return fallback;
+}
+
 export async function uploadSales(medicineId: string, file: File) {
 	const formData = new FormData();
 	formData.append('file', file);
