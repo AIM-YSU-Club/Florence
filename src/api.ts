@@ -2,7 +2,9 @@ import axios, { AxiosError, HttpStatusCode } from 'axios';
 
 // Dev: Vite proxy "/api" → "http://175.210.157.48:8000"
 // Prod: 직접 호출 (백엔드 CORS 설정 필요)
-const BASE = import.meta.env.DEV ? '/api' : 'http://175.210.157.48:8000';
+// const BASE = import.meta.env.DEV ? '/api' : 'http://175.210.157.48:8000';
+
+const BASE = '/api' // Vercel에서 직접 호출. CORS 설정됨.
 const AUTH_EXPIRES_AT_KEY = 'auth_expires_at';
 const LOGIN_SESSION_MS = 30 * 60 * 1000;
 
