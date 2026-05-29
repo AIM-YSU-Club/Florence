@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as api from '../../../api';
 import type { Medicine, Predict7dRes } from '../../../api';
 import * as React from 'react';
+import { CsvUploadErrorModal } from '../modals/CsvUploadErrorModal';
 import { CsvUploadHelpMessageModal } from '../modals/CsvUploadHelpMessageModal.tsx';
 import { DrugClimateCharts } from './drug-detail/DrugClimateCharts';
 import { DrugDetailHeader } from './drug-detail/DrugDetailHeader';
@@ -33,6 +34,7 @@ export function DrugDetailView({
 	const [uploadStatus, setUploadStatus] = useState<
 		'idle' | 'loading' | 'success' | 'error'
 	>('idle');
+	const [csvUploadErrorMessage, setCsvUploadErrorMessage] = useState('');
 
 	const [showCsvUploadHelpModal, setShowCsvUploadHelpModal] = useState(false);
 	const [doNotShowCsvHelpAgain, setDoNotShowCsvHelpAgain] = useState(
@@ -90,11 +92,15 @@ export function DrugDetailView({
 		if (!file) return;
 
 		setUploadStatus('loading');
+		setCsvUploadErrorMessage('');
 		try {
 			await api.uploadSales(medicine.medicine_id, file);
 			setUploadStatus('success');
 			setTimeout(() => setUploadStatus('idle'), 3000);
-		} catch {
+		} catch (error) {
+			setCsvUploadErrorMessage(
+				api.getApiErrorDetail(error, 'CSV 업로드에 실패했습니다.'),
+			);
 			setUploadStatus('error');
 			setTimeout(() => setUploadStatus('idle'), 3000);
 		}
@@ -204,6 +210,12 @@ export function DrugDetailView({
 					onConfirm={handleConfirmCsvHelp}
 					doNotShowAgain={doNotShowCsvHelpAgain}
 					onDoNotShowAgainChange={setDoNotShowCsvHelpAgain}
+				/>
+			)}
+			{csvUploadErrorMessage && (
+				<CsvUploadErrorModal
+					message={csvUploadErrorMessage}
+					onClose={() => setCsvUploadErrorMessage('')}
 				/>
 			)}
 		</div>
